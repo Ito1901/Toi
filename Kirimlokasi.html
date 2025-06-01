@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kirim Lokasi ke Firebase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kirim Lokasi Anda</h1>
+  <p id="status">Menunggu izin lokasi...</p>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <script>
+    const status = document.getElementById('status');
+
+    // Ganti config ini dengan milik kamu dari Firebase Console
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgpCDyAcY2oybvzs3-PESvGHKPVig7nuM",
+      authDomain: "apa-saja-lah-ffd2f.firebaseapp.com",
+      databaseURL: "https://apa-saja-lah-ffd2f-default-rtdb.firebaseio.com",
+      projectId: "apa-saja-lah-ffd2f",
+      storageBucket: "apa-saja-lah-ffd2f.firebasestorage.app",
+      messagingSenderId: "257160297050",
+      appId: "1:257160297050:web:289bdb728d406570a5b663"
+    };
+
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function kirimLokasi(lat, lon) {
+      // Buat id unik untuk user ini (bisa pakai timestamp)
+      const idUser = 'user_' + Date.now();
+
+      db.ref('lokasi/' + idUser).set({
+        latitude: lat,
+        longitude: lon,
+        waktu: new Date().toISOString()
+      });
+
+      status.textContent = `Lokasi berhasil dikirim: lat ${lat}, lon ${lon}`;
+    }
+
+    function error(err) {
+      status.textContent = 'Gagal mendapatkan lokasi: ' + err.message;
+    }
+
+    if (!navigator.geolocation) {
+      status.textContent = 'Geolocation tidak didukung browser ini.';
+    } else {
+      navigator.geolocation.getCurrentPosition(pos => {
+        kirimLokasi(pos.coords.latitude, pos.coords.longitude);
+      }, error);
+    }
+  </script>
+</body>
+</html>
